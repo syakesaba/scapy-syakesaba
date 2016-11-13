@@ -142,10 +142,6 @@ class Example(Packet):  # 必ずPacketクラスを継承すること
         @return p str パケットデータ。多くの場合pkt+payをreturnするだろう。
         """
         self.show()
-        print "===pkt==="
-        print pkt
-        print "===pay==="
-        print pay
         return Packet.post_build(self, pkt, pay)
 
     def build_padding(self):

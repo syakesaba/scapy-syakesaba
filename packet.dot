@@ -1,0 +1,66 @@
+/*
+Graphviz - DOT language writing!
+dot -Tjpg packet.dot -o packet.jpg
+*/
+
+digraph Diagram {
+    PROFILE [label = "Scapy Programming Flow", shape=none];
+    nodesep=0.1;//default nodesep
+    node [fontsize=10];//default node
+    edge [fontsize=9];//default edge
+
+    subgraph clusterDissect {
+        DISSECT [shape=doublecircle]
+        DISSECT -> pre_dissect [label="sniff,rdpcap,Ether()/somepacket,,"]
+        subgraph clusterDissection {
+            label = "Dissection";
+            dissection_done [label="dissection_done(self, pkt): calls post_dissection"];
+            post_dissection [label="post_dissection(self, pkt): called after all layer set"];
+        }
+        subgraph clusterDissectionFlow {
+            label = "DissectionFlow";
+            dissection_done -> post_dissection [label="CALL"];
+        }
+        subgraph clusterDissecting {
+            label = "Dissecting";
+            pre_dissect [label="pre_dissect(self, s): checksum,length check,...before dissect"];
+            do_dissect [label="do_dissect(self, s): constructs fields"];
+            post_dissect [label="post_dissect(self, s): checksum,length check,...after dissect"];
+        }
+        subgraph clusterDissectiingFlow {
+            label = "DissectingFlow";
+            pre_dissect -> do_dissect [label="validated"];
+            do_dissect -> post_dissect [label="crafted"];
+        }
+    }
+
+    subgraph clusterBuild {
+        label = "Building";
+        do_build [label="do_build(self)"];
+        build_padding [label="build_padding(self)"];
+        build_done [label="build_done(self, p)"];
+    }
+
+    subgraph clusterBinding {
+        label = "Binding";
+        style = bold;
+        bind_layers [label="bind_layers(lower, upper, __fval=None, **fval)"];
+        fields_desc [label="fields_desc=[,,,]"]
+        aliastypes [label="aliastypes=[,,,]"]
+        payload_guess [label="payload_guess=[,,,]"];
+    }
+
+    SIGTERM [shape=doublecircle, label="TEMRINATE"]
+
+    subgraph HaltFlow {
+        SIGTERM -> close_service [label=""];
+        close_service -> release_handler [label=""];
+    }
+
+    END [shape=doublecircle];
+
+    release_handler -> END [label="サーバの停止"];
+
+    { rank=same; START END } //配置を一緒の階層にする
+
+}

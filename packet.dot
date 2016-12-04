@@ -1,6 +1,6 @@
 /*
 Graphviz - DOT language writing!
-dot -Tjpg packet.dot -o packet.jpg
+dot -Tjpg packet.dot -O
 */
 
 digraph Diagram {
@@ -36,7 +36,15 @@ digraph Diagram {
 
     subgraph clusterBuild {
         label = "Building";
+        BUILDING [shape=doublecircle]
+        BUILDING -> do_build [label="str,sr,send,,"]
         do_build [label="do_build(self)"];
+        subgraph clusterDoBuilding {
+            label = "do_build loop";
+            self_build [label="dissection_done(self, pkt): calls post_dissection"];
+            do_build_payload [label="do_build_payload(self): calls do_build on payload"];
+            post_build [label="post_build(self, pkt, pay): called after all last layers built"];
+        }
         build_padding [label="build_padding(self)"];
         build_done [label="build_done(self, p)"];
     }
